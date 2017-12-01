@@ -6,6 +6,10 @@ const MockApp = require('../support/MockApp');
 
 describe('The Microservice Class', function(){
 
+    it('exposes a custom error class for typed error handling', function(){
+        expect(Microservice).to.have.property('Error');
+    });
+
     it('can be instantiated with an app instance which is exposed', function(){
         const app = new MockApp();
         const service = new Microservice(app);

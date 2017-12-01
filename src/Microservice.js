@@ -4,13 +4,14 @@ const loopback = require('loopback');
 const boot = require('loopback-boot');
 
 const MicroserviceApiClient = require('./MicroserviceApiClient');
+const MicroserviceError = require('./MicroserviceError');
 
 /**
  * Basic Microservice class wrapping a loopback application.
  *
  * @type {module.Microservice}
  */
-module.exports = class Microservice {
+const Microservice = module.exports = class Microservice {
 
     constructor(app, bootOptions = {}) {
         this.app = app;
@@ -145,3 +146,5 @@ module.exports = class Microservice {
     }
 
 };
+
+Microservice.Error = MicroserviceError;
