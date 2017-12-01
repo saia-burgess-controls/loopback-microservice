@@ -1,0 +1,15 @@
+{
+    "name": "Test",
+    "plural": "tests",
+    "public": true,
+    "base": "PersistedModel",
+    "properties": {
+        "name": {
+            "type": "string"
+        }
+    },
+    "validations": [],
+    "relations": {},
+    "acls": [],
+    "methods": {}
+}

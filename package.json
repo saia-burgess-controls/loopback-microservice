@@ -28,7 +28,7 @@
     "wrapper"
   ],
   "author": "Michael Rüfenacht",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/joinbox/loopback-relation-filter/issues"
   },

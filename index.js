@@ -1,3 +1,2 @@
-module.exports = function(loopbackApp, options) {
-
-};
+const Microservice = require('./src/Microservice');
+module.exports = Microservice;
