@@ -28,4 +28,15 @@ describe('The ApiClient Class', function(){
         expect(fullUrl).to.equal('http://test.com:3333/tests/');
     });
 
+    const methods = ['GET', 'PUT', 'POST', 'PATCH', 'OPTIONS', 'DELETE'];
+
+    methods.forEach((method) => {
+        const lowerMethod = method.toLowerCase();
+        it(`provides a method for ${method} requests`, function(){
+            const baseUrl = 'http://test.com:3333';
+            const client = new ApiClient(baseUrl);
+
+            expect(client).to.have.property(lowerMethod).that.is.a('function');
+        });
+    });
 });

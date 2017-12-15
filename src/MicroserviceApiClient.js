@@ -23,6 +23,10 @@ module.exports = class MicroserviceApiClient {
         return superagent.patch(this.createEndpoint(path), data);
     }
 
+    options(path){
+        return superagent.options(this.createEndpoint(path));
+    }
+
     delete(path, data) {
         return superagent.delete(this.createEndpoint(path), data);
     }
