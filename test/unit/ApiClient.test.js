@@ -4,10 +4,20 @@ const ApiClient = require('../../src/MicroserviceApiClient');
 
 describe('The ApiClient Class', function(){
 
-    it('can be instantiated with a base url', function(){
+    it('can be instantiated with a base url and exposes the used request library ' +
+        '(superagent per default)', function(){
         const baseUrl = 'http://test.com:3333';
         const client = new ApiClient(baseUrl);
         expect(client).to.have.property('base', baseUrl);
+        expect(client).to.have.property('request').that.is.ok;
+    });
+
+    it('accepts a requestLibrary as part of the constructor options', function(){
+        const baseUrl = 'http://test.com:3333';
+        const options = { requestLibrary: {}};
+        const client = new ApiClient(baseUrl, options);
+        expect(client).to.have.property('base', baseUrl);
+        expect(client).to.have.property('request', options.requestLibrary);
     });
 
     it('can be created from a parsed url using a factory function', function(){
@@ -18,6 +28,19 @@ describe('The ApiClient Class', function(){
         const client = ApiClient.fromURL({hostname, port, protocol});
 
         expect(client).to.have.property('base', `${protocol}://${hostname}:${port}`);
+    });
+
+    it('can be created from a parsed url using a factory function ' +
+        '(also accepting the options object)', function(){
+        const hostname = 'test.com';
+        const port = 3333;
+        const protocol = 'https';
+        const options = { requestLibrary: {}};
+
+        const client = ApiClient.fromURL({hostname, port, protocol}, options);
+
+        expect(client).to.have.property('base', `${protocol}://${hostname}:${port}`);
+        expect(client).to.have.property('request', options.requestLibrary);
     });
 
     it('appends paths to the base url', function(){
