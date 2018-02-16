@@ -55,6 +55,35 @@ you can perform queries as follows
 
 Using this api client is especially useful for integration testing.
 
+## Error Handling
+
+The package exposes a custom error class, useful for typed error handling. This allows you to 
+differentiate between your errors and errors caused by the rest of the application.
+
+One can pass additional data to the error by passing an additional object to the constructor, which is assigned to the error
+instance.
+
+```Javascript
+    const MicroserviceError = require('loopback-microservice').Error;
+    class MyServiceError extends MicroserviceError {}
+    
+    // usage
+    try {
+        throw new MyServiceError('An error message', {
+                status: 400,
+                code: 'HOLY_MOLY',
+                original: previousError
+            });
+    } catch (error) {
+        if(error instanceof MyServiceError){
+            // handle your errors
+            if(error.status === 400){
+            }
+        }
+        throw error;
+    }
+``` 
+
 ## Testing
 
 Check the `package.json` to see how to execute tests:
