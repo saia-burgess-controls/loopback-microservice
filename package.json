@@ -1,0 +1,48 @@
+{
+  "name": "loopback-microservice",
+  "version": "0.1.0",
+  "description": "Thin layer to wrap the loopback application for easier testing and sharing of functionality between repositories.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "engines": {
+    "node": "^8.0.0",
+    "npm": "^5.0.0"
+  },
+  "scripts": {
+    "lint": "node_modules/.bin/eslint .",
+    "test:watch": "WATCH_TESTS=\"--watch\" npm run test",
+    "test:base": "mocha $NODE_DEBUG_OPTION $WATCH_TESTS --recursive --check-leaks --full-trace --exit",
+    "test:unit": "npm run test:base ./test/support/setup/unit.js ./test/unit",
+    "test:integration": "npm run test:base ./test/support/setup/integration.js ./test/integration",
+    "test": "npm run test:base ./test/support/setup/integration.js ./test/integration ./test/unit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joinbox/loopback-relation-filter.git"
+  },
+  "keywords": [
+    "loopback",
+    "microservice",
+    "wrapper"
+  ],
+  "author": "Michael Rüfenacht",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/joinbox/loopback-relation-filter/issues"
+  },
+  "homepage": "https://github.com/joinbox/loopback-relation-filter#readme",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "eslint": "^4.12.1",
+    "eslint-config-joinbox": "git+https://github.com/joinbox/joinbox-linter-configuration.git",
+    "mocha": "^4.0.1",
+    "npm": "^5.5.1"
+  },
+  "dependencies": {
+    "loopback": "^3.17.0",
+    "loopback-boot": "^2.27.0",
+    "superagent": "^3.8.1"
+  }
+}
