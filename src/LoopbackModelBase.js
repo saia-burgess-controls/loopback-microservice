@@ -1,4 +1,4 @@
-const MicroserviceError = require('@joinbox/loopback-microservice');
+const MicroserviceError = require('./MicroserviceError');
 
 module.exports = class LoopbackModelBase {
     constructor({ modelName, model }) {
