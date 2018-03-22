@@ -2,16 +2,12 @@ const MicroserviceError = require('./MicroserviceError');
 
 module.exports = class LoopbackModelBase {
     constructor({ modelName, model }) {
-        if (!modelName) {
-            throw LoopbackModelBase.createError(`No modelName was given to the
-                LoopbackModelBase constructor`);
-        }
         if (!model) {
             throw LoopbackModelBase.createError(`No Loopback Model Instance was given to the
                 LoopbackModelBase constructor`);
         }
 
-        this.modelName = modelName;
+        this.modelName = modelName || model.modelName;
         this[this.modelName] = model;
     }
 
