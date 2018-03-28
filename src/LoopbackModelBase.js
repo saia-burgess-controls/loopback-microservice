@@ -9,6 +9,46 @@ module.exports = class LoopbackModelBase {
 
         this.modelName = modelName || model.modelName;
         this[this.modelName] = model;
+
+        const functions = this.getPrototypeFunctionsRecursive(this);
+        functions.forEach((prototypeFunction, key) => {
+            if (!this[this.modelName][key]) {
+                this[this.modelName][key] = prototypeFunction.bind(this);
+            } else {
+                throw LoopbackModelBase.createError(`You are overwriting an loopback internal function ${key} on the model ${this.modelName}`);
+            }
+        });
+    }
+
+    /**
+     * loops recursively trought the given objects pprototypes, reurns all
+     * prototoype functions except 'constructor' and the JavaScript Objects
+     * constructor prototype functions
+     *
+     * @param  {Object} object                  The object to extract prototype functions
+     * @param  {Map}    [functions=new Map()]   Map to store the functions
+     * @return {Map}                            A map with all prototpye functions
+     */
+    getPrototypeFunctionsRecursive(object, functions = new Map()) {
+        const prototype = Object.getPrototypeOf(object);
+        const isObjectPrototype = !Object.getPrototypeOf(prototype);
+
+        if (prototype && !isObjectPrototype) {
+            const properties = Object.getOwnPropertyNames(prototype);
+            properties.forEach((propertyName) => {
+                const currentProperty = prototype[propertyName];
+                if (
+                    typeof currentProperty === 'function' &&
+                    propertyName !== 'constructor'
+                ) {
+                    functions.set(propertyName, currentProperty);
+                }
+            });
+
+            this.getPrototypeFunctionsRecursive(prototype, functions);
+        }
+
+        return functions;
     }
 
     /**
@@ -37,7 +77,7 @@ module.exports = class LoopbackModelBase {
     getEnv() {
         if (!this.appEnv) {
             if (!this[this.modelName].app) {
-                throw this.createError(`The loopback application environment could
+                throw LoopbackModelBase.createError(`The loopback application environment could
                     not be loaded becaus the application was not initalized yet.`);
             }
 
