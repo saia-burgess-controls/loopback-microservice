@@ -10,6 +10,7 @@ module.exports = class LoopbackModelBase {
         this.modelName = modelName || model.modelName;
         this[this.modelName] = model;
 
+
         const functions = this.getPrototypeFunctionsRecursive(this);
         functions.forEach((prototypeFunction, key) => {
             if (!this[this.modelName][key]) {
@@ -19,7 +20,7 @@ module.exports = class LoopbackModelBase {
             }
         });
     }
-
+    
     /**
      * loops recursively trought the given objects pprototypes, reurns all
      * prototoype functions except 'constructor' and the JavaScript Objects
@@ -31,9 +32,9 @@ module.exports = class LoopbackModelBase {
      */
     getPrototypeFunctionsRecursive(object, functions = new Map()) {
         const prototype = Object.getPrototypeOf(object);
-        const isObjectPrototype = !Object.getPrototypeOf(prototype);
+        const isLastPrototype = !Object.getPrototypeOf(prototype);
 
-        if (prototype && !isObjectPrototype) {
+        if (prototype && !isLastPrototype) {
             const properties = Object.getOwnPropertyNames(prototype);
             properties.forEach((propertyName) => {
                 const currentProperty = prototype[propertyName];
@@ -58,15 +59,19 @@ module.exports = class LoopbackModelBase {
      * @param  {Function} hookFunction  hook callback
      * @return void
      */
-    registerHook(hook, method, hookFunction) {
+    registerHook(hook, method, hookFunction, registerContext) {
         this[this.modelName][hook](method, (...params) => {
             const next = params.pop();
 
-            hookFunction.apply(this, params).then((stop) => {
-                if (!stop) {
-                    next();
-                }
-            }).catch(next);
+            hookFunction.apply(this, [...params, registerContext])
+                .then((stop) => {
+                    if (!stop) {
+                        next();
+                    }
+                })
+                .catch((error) => {
+                    next(error);
+                });
         });
     }
 
