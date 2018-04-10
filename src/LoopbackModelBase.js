@@ -8,19 +8,19 @@ module.exports = class LoopbackModelBase {
         }
 
         this.modelName = modelName || model.modelName;
-        this[this.modelName] = model;
+        this.loopbackModel = model;
 
 
         const functions = this.getPrototypeFunctionsRecursive(this);
         functions.forEach((prototypeFunction, key) => {
-            if (!this[this.modelName][key]) {
-                this[this.modelName][key] = prototypeFunction.bind(this);
+            if (!this.loopbackModel[key]) {
+                this.loopbackModel[key] = prototypeFunction.bind(this);
             } else {
                 throw LoopbackModelBase.createError(`You are overwriting an loopback internal function ${key} on the model ${this.modelName}`);
             }
         });
     }
-    
+
     /**
      * loops recursively trought the given objects pprototypes, reurns all
      * prototoype functions except 'constructor' and the JavaScript Objects
@@ -60,7 +60,7 @@ module.exports = class LoopbackModelBase {
      * @return void
      */
     registerHook(hook, method, hookFunction, registerContext) {
-        this[this.modelName][hook](method, (...params) => {
+        this.loopbackModel[hook](method, (...params) => {
             const next = params.pop();
 
             hookFunction.apply(this, [...params, registerContext])
@@ -81,12 +81,12 @@ module.exports = class LoopbackModelBase {
      */
     getEnv() {
         if (!this.appEnv) {
-            if (!this[this.modelName].app) {
+            if (!this.loopbackModel.app) {
                 throw LoopbackModelBase.createError(`The loopback application environment could
                     not be loaded becaus the application was not initalized yet.`);
             }
 
-            this.appEnv = this[this.modelName].app.get('env');
+            this.appEnv = this.loopbackModel.app.get('env');
         }
 
         return this.appEnv;
