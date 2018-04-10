@@ -22,7 +22,7 @@ module.exports = class LoopbackModelBase {
     }
 
     /**
-     * loops recursively trought the given objects pprototypes, reurns all
+     * loops recursively through the given objects prototypes, returns all
      * prototoype functions except 'constructor' and the JavaScript Objects
      * constructor prototype functions
      *
@@ -69,9 +69,7 @@ module.exports = class LoopbackModelBase {
                         next();
                     }
                 })
-                .catch((error) => {
-                    next(error);
-                });
+                .catch(next);
         });
     }
 
@@ -82,8 +80,11 @@ module.exports = class LoopbackModelBase {
     getEnv() {
         if (!this.appEnv) {
             if (!this.loopbackModel.app) {
-                throw LoopbackModelBase.createError(`The loopback application environment could
-                    not be loaded becaus the application was not initalized yet.`);
+                throw LoopbackModelBase.createError(`
+                    The loopback application environment could
+                    not be loaded because the application was not initalized yet.
+                    Therefore not app object is avalialble.
+                    Usualyy this means you need to call the looback boot function`);
             }
 
             this.appEnv = this.loopbackModel.app.get('env');
