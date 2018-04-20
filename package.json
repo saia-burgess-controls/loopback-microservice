@@ -1,6 +1,6 @@
 {
   "name": "@joinbox/loopback-microservice",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Thin layer to wrap the loopback application for easier testing and sharing of functionality between repositories.",
   "main": "index.js",
   "directories": {
@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/joinbox/loopback-relation-filter.git"
+    "url": "git+https://github.com/joinbox/loopback-microservice.git"
   },
   "keywords": [
     "loopback",
@@ -30,9 +30,9 @@
   "author": "Michael Rüfenacht",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/joinbox/loopback-relation-filter/issues"
+    "url": "https://github.com/joinbox/loopback-microservice/issues"
   },
-  "homepage": "https://github.com/joinbox/loopback-relation-filter#readme",
+  "homepage": "https://github.com/joinbox/loopback-microservice#readme",
   "devDependencies": {
     "chai": "^4.1.2",
     "eslint": "^4.12.1",
