@@ -148,3 +148,4 @@ const Microservice = module.exports = class Microservice {
 };
 
 Microservice.Error = MicroserviceError;
+Microservice.MicroserviceError = MicroserviceError;
