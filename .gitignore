@@ -1,1 +1,3 @@
 .nyc_output
+# I like to have a tryout file to quickly test code.
+tryout.js
