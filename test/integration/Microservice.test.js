@@ -3,12 +3,26 @@ const path = require('path');
 const { expect } = require('chai');
 
 const Microservice = require('../../src/Microservice');
+const appRootDir = path.resolve(__dirname, '../support/fixtures/loopback');
 
 describe('The Microservice', function() {
 
     before('boot a service', async function(){
-        const appRootDir = path.resolve(__dirname, '../support/fixtures/loopback');
         this.ms = await Microservice.boot({appRootDir});
+    });
+
+
+    it('can be directly started from a static method taking the boot options as a parameter', async function(){
+        const ms = await Microservice.start({appRootDir});
+        try {
+            expect(ms).to.be.an.instanceOf(Microservice);
+            await ms.stop();
+        } catch (err) {
+            // make shure the microservice is properly shut down
+            await ms.stop();
+            // throw the assertions
+            throw err;
+        }
     });
 
     it('is properly booted exposing models', function(){
