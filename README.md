@@ -4,13 +4,16 @@ Thin layer to wrap the loopback application for easier testing and sharing of fu
 
 ## General
 
-Installation currently only via git repos, _i.e._ `"loopback-microservice": "git@github.com:joinbox/loopback-microservice.git"`
-in your `package.json`.
+Install it via npm:
+
+```Bash
+npm install @joinbox/loopback-microservice
+```
 
 You can start your microservice using the static `start` method:
 
 ```Javascript
-    const Microservice = require('loopback-microservice');
+    const Microservice = require('@joinbox/loopback-microservice');
     const service = await Microservice.start();
 ```
 
@@ -19,7 +22,7 @@ internal server. Sometimes you don't need the server to be listening to the inte
 want access to configured models and the datasources. Therefore you can boot the application:
 
 ```Javascript
-    const Microservice = require('loopback-microservice');
+    const Microservice = require('@joinbox/loopback-microservice');
     const service = await Microservice.boot();
     // access the loopback application
     const loopbackApp = service.app;
@@ -64,7 +67,7 @@ One can pass additional data to the error by passing an additional object to the
 instance.
 
 ```Javascript
-    const MicroserviceError = require('loopback-microservice').Error;
+    const { MicroserviceError } = require('@joinbox/loopback-microservice');
     class MyServiceError extends MicroserviceError {}
     
     // usage
@@ -82,7 +85,11 @@ instance.
         }
         throw error;
     }
-``` 
+```
+
+> **Note**: The error class was (and still is for backwards compatibility) previously exposed as 
+Error. Since this might lead to unwanted side effects when using destructuring - _i.e._ would override
+the standard Error class - we also expose it at the `MicroserviceError` property.
 
 ## Testing
 

@@ -11,7 +11,7 @@ const MicroserviceError = require('./MicroserviceError');
  *
  * @type {module.Microservice}
  */
-const Microservice = module.exports = class Microservice {
+module.exports = class Microservice {
 
     constructor(app, bootOptions = {}) {
         this.app = app;
@@ -63,7 +63,7 @@ const Microservice = module.exports = class Microservice {
         if (this.isRunning()){
             return this;
         } else {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 // @note: this method might throw an exception, we should not catch it,
                 //        due to possible issues in the testing
                 this.server = this.app.listen(() => {
@@ -147,4 +147,5 @@ const Microservice = module.exports = class Microservice {
 
 };
 
-Microservice.Error = MicroserviceError;
+module.exports.Error = MicroserviceError;
+module.exports.MicroserviceError = MicroserviceError;
