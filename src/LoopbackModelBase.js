@@ -84,7 +84,7 @@ module.exports = class LoopbackModelBase {
                     The loopback application environment could
                     not be loaded because the application was not initalized yet.
                     Therefore not app object is avalialble.
-                    Usualyy this means you need to call the looback boot function`);
+                    Usualy this means you need to call the looback boot function`);
             }
 
             this.appEnv = this.loopbackModel.app.get('env');
