@@ -148,5 +148,6 @@ module.exports = class Microservice {
 
 };
 
-Microservice.Error = MicroserviceError;
-Microservice.LoopbackModelBase = LoopbackModelBase;
+module.exports.Error = MicroserviceError;
+module.exports.MicroserviceError = MicroserviceError;
+module.exports.LoopbackModelBase = LoopbackModelBase;

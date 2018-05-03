@@ -1,6 +1,6 @@
 {
   "name": "@joinbox/loopback-microservice",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Thin layer to wrap the loopback application for easier testing and sharing of functionality between repositories.",
   "main": "index.js",
   "directories": {
@@ -13,10 +13,10 @@
   "scripts": {
     "lint": "node_modules/.bin/eslint .",
     "test:watch": "WATCH_TESTS=\"--watch\" npm run test",
-    "test:base": "mocha $NODE_DEBUG_OPTION $WATCH_TESTS --recursive --check-leaks --full-trace --exit",
+    "test:base": "./node_modules/.bin/mocha $NODE_DEBUG_OPTION $WATCH_TESTS --recursive --check-leaks --full-trace --exit",
     "test:unit": "npm run test:base ./test/support/setup/unit.js ./test/unit",
     "test:integration": "npm run test:base ./test/support/setup/integration.js ./test/integration",
-    "test": "nyc npm run test:base ./test/support/setup/integration.js ./test/integration ./test/unit"
+    "test": "./node_modules/.bin/nyc npm run test:base ./test/support/setup/integration.js ./test/integration ./test/unit"
   },
   "repository": {
     "type": "git",
