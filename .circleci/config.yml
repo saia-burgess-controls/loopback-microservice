@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  test:
+  build:
     docker:
      - image: circleci/node:8
     steps:
@@ -11,4 +11,4 @@ workflows:
   version: 2
   test:
     jobs:
-      - test
+      - build
