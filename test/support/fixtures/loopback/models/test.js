@@ -1,3 +1,2 @@
-module.exports = function(Test){
+module.exports = function(Test){};
 
-};

@@ -4,7 +4,8 @@ const url = require('url');
 module.exports = class MicroserviceApiClient {
 
     constructor(baseUrl, {requestLibrary = superagent} = {}) {
-        this.base = baseUrl;
+        this.PATH_SEPARATOR = '/';
+        this.base = this._normalizeBase(baseUrl);
         this.request = requestLibrary;
     }
 
@@ -33,7 +34,22 @@ module.exports = class MicroserviceApiClient {
     }
 
     createEndpoint(path) {
-        return `${this.base}${path}`;
+        const relativePath = this._normalizePath(path);
+        return url.resolve(this.base, relativePath);
+    }
+
+    _normalizePath(path = '', separator = '/'){
+        if(path.startsWith(this.PATH_SEPARATOR)){
+            return path.slice(this.PATH_SEPARATOR.length);
+        }
+        return path;
+    }
+
+    _normalizeBase(baseUrl, separator = '/'){
+        if(!baseUrl.endsWith(separator)){
+            return `${baseUrl}${separator}`;
+        }
+        return baseUrl;
     }
 
     static fromURL(urlOptions, options = {}) {

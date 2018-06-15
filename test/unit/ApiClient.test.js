@@ -5,18 +5,18 @@ const ApiClient = require('../../src/MicroserviceApiClient');
 describe('The ApiClient Class', function(){
 
     it('can be instantiated with a base url and exposes the used request library ' +
-        '(superagent per default)', function(){
-        const baseUrl = 'http://test.com:3333';
+        '(superagent by default)', function(){
+        const baseUrl = 'http://test.com:3333/';
         const client = new ApiClient(baseUrl);
         expect(client).to.have.property('base', baseUrl);
         expect(client).to.have.property('request').that.is.ok;
     });
 
-    it('accepts a requestLibrary as part of the constructor options', function(){
+    it('accepts a requestLibrary as part of the constructor options and normalizes the base url', function(){
         const baseUrl = 'http://test.com:3333';
         const options = { requestLibrary: {}};
         const client = new ApiClient(baseUrl, options);
-        expect(client).to.have.property('base', baseUrl);
+        expect(client).to.have.property('base', `${baseUrl}/`);
         expect(client).to.have.property('request', options.requestLibrary);
     });
 
@@ -27,7 +27,7 @@ describe('The ApiClient Class', function(){
 
         const client = ApiClient.fromURL({hostname, port, protocol});
 
-        expect(client).to.have.property('base', `${protocol}://${hostname}:${port}`);
+        expect(client).to.have.property('base', `${protocol}://${hostname}:${port}/`);
     });
 
     it('can be created from a parsed url using a factory function ' +
@@ -39,7 +39,7 @@ describe('The ApiClient Class', function(){
 
         const client = ApiClient.fromURL({hostname, port, protocol}, options);
 
-        expect(client).to.have.property('base', `${protocol}://${hostname}:${port}`);
+        expect(client).to.have.property('base', `${protocol}://${hostname}:${port}/`);
         expect(client).to.have.property('request', options.requestLibrary);
     });
 
@@ -50,6 +50,32 @@ describe('The ApiClient Class', function(){
 
         expect(fullUrl).to.equal('http://test.com:3333/tests/');
     });
+
+    it('normalizes urls with leading separator', function(){
+        const baseUrl = 'http://test.com:3333/';
+        const client = new ApiClient(baseUrl);
+        const fullUrl = client.createEndpoint('/tests/');
+
+        expect(fullUrl).to.equal('http://test.com:3333/tests/');
+    });
+
+    it('normalizes urls with a base path', function(){
+        const baseUrl = 'http://test.com:3333/api/';
+        const client = new ApiClient(baseUrl);
+        const fullUrl = client.createEndpoint('/tests/');
+
+        expect(fullUrl).to.equal('http://test.com:3333/api/tests/');
+    });
+
+    it('normalizes urls without leading separator', function(){
+        const baseUrl = 'http://test.com:3333';
+        const client = new ApiClient(baseUrl);
+        const fullUrl = client.createEndpoint('tests/');
+
+        expect(fullUrl).to.equal('http://test.com:3333/tests/');
+    });
+
+
 
     const methods = ['GET', 'PUT', 'POST', 'PATCH', 'OPTIONS', 'DELETE'];
 

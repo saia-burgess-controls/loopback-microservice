@@ -18,7 +18,7 @@ describe('The Microservice', function() {
             expect(ms).to.be.an.instanceOf(Microservice);
             await ms.stop();
         } catch (err) {
-            // make shure the microservice is properly shut down
+            // make sure the microservice is properly shut down
             await ms.stop();
             // throw the assertions
             throw err;
@@ -43,15 +43,17 @@ describe('The Microservice', function() {
         expect(service)
             .to.have.property('api')
             .that.has.property('base')
-            .that.equals('http://0.0.0.0:3333/api');
+            .that.equals('http://0.0.0.0:3333/api/');
     });
 
     it('the api client allows querying the api', async function(){
+
         const service = await this.ms.start();
-        const response = await service.api
+        const response = await service
+            .api
             .get('/tests')
-            .set('accept', 'application/json')
-            .then((response) => response);
+            .set('accept', 'application/json');
+
         expect(response).to.have.property('status', 200);
     });
 
