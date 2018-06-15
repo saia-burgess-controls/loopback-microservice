@@ -2,6 +2,8 @@ const { expect } = require('chai');
 
 const ApiClient = require('../../src/MicroserviceApiClient');
 
+const httpVerbs = ['GET', 'PUT', 'POST', 'PATCH', 'OPTIONS', 'DELETE'];
+
 describe('The ApiClient Class', function(){
 
     it('can be instantiated with a base url and exposes the used request library ' +
@@ -75,17 +77,54 @@ describe('The ApiClient Class', function(){
         expect(fullUrl).to.equal('http://test.com:3333/tests/');
     });
 
+    const requestLibrary = getRequestMock(httpVerbs);
+    const baseUrl = 'http://test.com:3333';
+    const testPath = '/testing/'
+    const client = new ApiClient(baseUrl, {requestLibrary});
 
+    httpVerbs.forEach((method) => {
+        const methodName = method.toLowerCase();
+        it(`provides a method for ${method} requests`, async function(){
+            const method = client[methodName];
 
-    const methods = ['GET', 'PUT', 'POST', 'PATCH', 'OPTIONS', 'DELETE'];
+            expect(method).to.be.a('function');
 
-    methods.forEach((method) => {
-        const lowerMethod = method.toLowerCase();
-        it(`provides a method for ${method} requests`, function(){
-            const baseUrl = 'http://test.com:3333';
-            const client = new ApiClient(baseUrl);
+            await method.call(client, testPath);
 
-            expect(client).to.have.property(lowerMethod).that.is.a('function');
+            const { calls } = requestLibrary;
+
+            expect(calls).to.have.property(methodName).that.has.length(1);
+
+            const call = calls[methodName][0];
+
+            expect(call).to.have.property('path', 'http://test.com:3333/testing/');
         });
     });
 });
+
+function getRequestMock(verbs = []){
+    const mock = {
+        calls: {},
+        _countInvocation(method, path, data){
+            if(!Array.isArray(mock.calls[method])){
+                mock.calls[method] = [];
+            }
+            mock.calls[method].push({
+                path,
+                data,
+            });
+            return {
+                status: 200,
+                body: {},
+            };
+        }
+    };
+    // create methods for each http verb
+    verbs.forEach((verb) => {
+        const lowerVerb = verb.toLowerCase();
+        mock[lowerVerb] = async (path, data) => {
+            return mock._countInvocation(lowerVerb, path, data);
+        };
+    })
+    return mock;
+}

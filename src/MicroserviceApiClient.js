@@ -4,7 +4,6 @@ const url = require('url');
 module.exports = class MicroserviceApiClient {
 
     constructor(baseUrl, {requestLibrary = superagent} = {}) {
-        this.PATH_SEPARATOR = '/';
         this.base = this._normalizeBase(baseUrl);
         this.request = requestLibrary;
     }
@@ -39,8 +38,8 @@ module.exports = class MicroserviceApiClient {
     }
 
     _normalizePath(path = '', separator = '/'){
-        if(path.startsWith(this.PATH_SEPARATOR)){
-            return path.slice(this.PATH_SEPARATOR.length);
+        if(path.startsWith(separator)){
+            return path.slice(separator.length);
         }
         return path;
     }

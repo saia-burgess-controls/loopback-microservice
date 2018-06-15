@@ -44,4 +44,22 @@ describe('The Microservice Class', function(){
         expect(service.bootOptions).to.deep.equal(bootOptions);
     });
 
+    it('accepts boot options that contain a property serviceName (which is not part of loopbacks' +
+        'boot options) and sets it as its name accessible via corresponding getters', function(){
+        const app = new MockApp();
+        const bootOptions = {
+            appRootDir: './test',
+            appConfigRootDir: './test/config',
+            componentRootDir: './test/config',
+            dsRootDir: '/app/config',
+            env: 'test',
+            middlewareRootDir: '/test/config',
+            modelsRootDir: '/test/config',
+            serviceName: 'test-service',
+        };
+        const service = new Microservice(app, bootOptions);
+
+        expect(service.bootOptions).to.deep.equal(bootOptions);
+        expect(service.getName()).to.be.equal('test-service');
+    });
 });

@@ -15,11 +15,22 @@ const LoopbackModelBase = require('./LoopbackModelBase');
 module.exports = class Microservice {
 
     constructor(app, bootOptions = {}) {
+
         this.app = app;
+        this.name = bootOptions.serviceName || 'Microservice';
+
         this.server = null;
         this.api = null;
 
         this.bootOptions = Object.assign({}, bootOptions);
+    }
+
+    getName(){
+        return this.name;
+    }
+
+    setName(name){
+        this.name = name;
     }
 
     isRunning() {
