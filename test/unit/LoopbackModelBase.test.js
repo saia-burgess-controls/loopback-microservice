@@ -6,11 +6,8 @@ const MockApp = require('../support/MockApp');
 
 describe('The LoopbackModelBase Class', function() {
     it('throws an error if no model is given', function(){
-        try {
-            new LoopbackModelBase({ });
-        } catch (error) {
-            expect(error).to.have.property('message', 'No Loopback Model Instance was given to the\n                LoopbackModelBase constructor');
-        }
+        const msg = 'No Loopback model instance was given to the LoopbackModelBase constructor';
+        expect(() => new LoopbackModelBase({ })).to.throw(msg);
     });
 
     it('creates an instance with the given values', function(){
@@ -19,16 +16,12 @@ describe('The LoopbackModelBase Class', function() {
         expect(instance).to.have.property('modelName', 'test');
     });
 
-    it('throws an error when calling get env without loopback booted', function(){
+    it('throws an error when calling get env without Loopback being booted', function(){
         const instance = new LoopbackModelBase({ model: {}, modelName: 'test' });
-        let env;
-        try {
-            evn = instance.getEnv();
-        } catch (error) {
-            expect(error).to.have.property('message', '\n                    The loopback application environment could\n                    not be loaded because the application was not initalized yet.\n                    Therefore not app object is avalialble.\n                    Usualy this means you need to call the looback boot function');
-        }
+        const msg = 'The Loopback application environment could not be loaded because the' +
+            'application was not initalized yet (it might not be booted)';
 
-        expect(env).to.equals(undefined);
+        expect(() => instance.getEnv()).to.throw(msg);
     });
 
     it('createError returns an error ', function(){
@@ -37,13 +30,26 @@ describe('The LoopbackModelBase Class', function() {
         expect(error).to.have.property('message', 'test error');
     });
 
+    it('throws an error when the extending model tries to override Loopback model internals', function(){
+        class TestModel extends LoopbackModelBase {
+            // this is a loopback internal model function
+            remoteMethod(){}
+        }
+        const model = {
+            remoteMethod(){},
+            modelName: 'LoopbackTest',
+        };
+        // message should contain remote method and LoopbackTest
+        expect(() => new TestModel({model})).to.throw(/remoteMethod.*?LoopbackTest/gi);
+    });
+
     it('getPrototypeFunctionsRecursive returns all functions of the prototype chain', function(){
         const instance = new LoopbackModelBase({ model: {}, modelName: 'test' });
         class TestClass  {
             testFunction() {}
         }
         const functions = instance.getPrototypeFunctionsRecursive(new TestClass());
-        
+
         expect(functions.has('testFunction')).to.equals(true);
     });
 

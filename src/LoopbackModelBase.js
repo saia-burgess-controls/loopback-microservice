@@ -3,8 +3,8 @@ const MicroserviceError = require('./MicroserviceError');
 module.exports = class LoopbackModelBase {
     constructor({ modelName, model }) {
         if (!model) {
-            throw LoopbackModelBase.createError(`No Loopback Model Instance was given to the
-                LoopbackModelBase constructor`);
+            const msg = 'No Loopback model instance was given to the LoopbackModelBase constructor';
+            throw LoopbackModelBase.createError(msg);
         }
 
         this.modelName = modelName || model.modelName;
@@ -16,7 +16,9 @@ module.exports = class LoopbackModelBase {
             if (!this.loopbackModel[key]) {
                 this.loopbackModel[key] = prototypeFunction.bind(this);
             } else {
-                throw LoopbackModelBase.createError(`You are overwriting an loopback internal function ${key} on the model ${this.modelName}`);
+                const msg = 'You are overwriting an loopback internal function ' +
+                    `${key} on the model ${this.modelName}`;
+                throw LoopbackModelBase.createError(msg);
             }
         });
     }
@@ -80,11 +82,9 @@ module.exports = class LoopbackModelBase {
     getEnv() {
         if (!this.appEnv) {
             if (!this.loopbackModel.app) {
-                throw LoopbackModelBase.createError(`
-                    The loopback application environment could
-                    not be loaded because the application was not initalized yet.
-                    Therefore not app object is avalialble.
-                    Usualy this means you need to call the looback boot function`);
+                const msg = 'The Loopback application environment could not be loaded because the' +
+                    'application was not initalized yet (it might not be booted)';
+                throw LoopbackModelBase.createError(msg);
             }
 
             this.appEnv = this.loopbackModel.app.get('env');
