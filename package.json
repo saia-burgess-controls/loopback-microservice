@@ -11,7 +11,8 @@
     "npm": "^5.0.0"
   },
   "scripts": {
-    "lint": "node_modules/.bin/eslint .",
+    "lint": "npm run lint:file .",
+    "lint:file": "node_modules/.bin/eslint -- ",
     "test:watch": "WATCH_TESTS=\"--watch\" npm run test",
     "test:base": "./node_modules/.bin/mocha $NODE_DEBUG_OPTION $WATCH_TESTS --recursive --check-leaks --full-trace --exit",
     "test:unit": "npm run test:base ./test/support/setup/unit.js ./test/unit",

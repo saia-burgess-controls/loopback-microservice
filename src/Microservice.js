@@ -31,7 +31,7 @@ module.exports = class Microservice {
         this.bootOptions = bootOptions;
     }
 
-    getName(){
+    getName() {
         return this.name;
     }
 
@@ -49,7 +49,7 @@ module.exports = class Microservice {
         if (!this.isRunning()) {
             return this;
         } else {
-            const server = this.server;
+            const { server } = this;
             // avoid race conditions
             this.server = null;
             return new Promise((resolve, reject) => {
@@ -74,7 +74,7 @@ module.exports = class Microservice {
      */
     async start() {
 
-        if (this.isRunning()){
+        if (this.isRunning()) {
             return this;
         } else {
             return new Promise((resolve) => {
@@ -103,7 +103,7 @@ module.exports = class Microservice {
 
     }
 
-    setupApiClient(app){
+    setupApiClient(app) {
         const options = {
             hostname: app.get('host'),
             port: app.get('port'),
@@ -161,14 +161,14 @@ module.exports = class Microservice {
 
     static getConfig(app, key, fallback) {
         const config = app.get('microservice') || {};
-        if(key){
+        if (key) {
             return config[key] || fallback;
         } else {
             return config;
         }
     }
 
-    static getServiceName(app, fallback = 'Microservice'){
+    static getServiceName(app, fallback = 'Microservice') {
         return this.getConfig(app, 'name', fallback);
     }
 };
