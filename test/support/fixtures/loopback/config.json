@@ -1,4 +1,12 @@
 {
     "host": "0.0.0.0",
-    "port": 3333
+    "port": 3333,
+    "microservice": {
+        "name": "test-service"
+    },
+    "remoting": {
+        "rest": {
+            "handleErrors": false
+        }
+    }
 }

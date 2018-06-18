@@ -44,22 +44,28 @@ describe('The Microservice Class', function(){
         expect(service.bootOptions).to.deep.equal(bootOptions);
     });
 
-    it('accepts boot options that contain a property serviceName (which is not part of loopbacks' +
-        'boot options) and sets it as its name accessible via corresponding getters', function(){
-        const app = new MockApp();
-        const bootOptions = {
-            appRootDir: './test',
-            appConfigRootDir: './test/config',
-            componentRootDir: './test/config',
-            dsRootDir: '/app/config',
-            env: 'test',
-            middlewareRootDir: '/test/config',
-            modelsRootDir: '/test/config',
-            serviceName: 'test-service',
+    it('takes configuration values from the app using the "microservice" key', function(){
+        const microservice = {
+            name: 'test-service',
         };
-        const service = new Microservice(app, bootOptions);
+        const app = new MockApp({microservice});
+        const service = new Microservice(app, {});
 
-        expect(service.bootOptions).to.deep.equal(bootOptions);
         expect(service.getName()).to.be.equal('test-service');
+    });
+
+    it('the options object can have a boot section for future use', function(){
+        const microservice = {
+            name: 'test-service',
+        };
+        const options = {
+            boot: {
+                appRootDir: './test',
+            },
+        };
+        const app = new MockApp({microservice});
+        const service = new Microservice(app, options);
+
+        expect(service.bootOptions).to.be.deep.equal(options.boot);
     });
 });

@@ -5,5 +5,14 @@
                 "${restApiRoot}"
             ]
         }
+    },
+    "final:after": {
+        "../../../../index#errorHandler": {
+            "params": {
+                "log": false,
+                "debug": false,
+                "microservice": "${microservice}"
+            }
+        }
     }
 }

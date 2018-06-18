@@ -25,12 +25,11 @@ describe('The Microservice', function() {
         }
     });
 
-    it('is properly booted exposing models', function(){
+    it('boots the loopback app', function(){
         expect(this.ms.app)
             .to.have.property('models')
             .that.has.property('Test');
     });
-
 
     it('can be started, returning a promise which resolves the service ' +
         '(returns the running instance if already started)', async function() {
@@ -55,6 +54,22 @@ describe('The Microservice', function() {
             .set('accept', 'application/json');
 
         expect(response).to.have.property('status', 200);
+    });
+
+    it('exposes an error handler which enriches the error with the serviceName ' +
+        'if configured accordingly', async function(){
+
+        const service = await this.ms.start();
+        try {
+            const response = await service
+                .api
+                .get('/nonExisting')
+                .set('accept', 'application/json');
+            return Promise.reject(new Error('Request to non existing route should fail.'))
+        } catch ({response}) {
+            const {body} = response;
+            expect(body.error).to.have.property('serviceName', 'test-service');
+        }
     });
 
     it('can be stopped, returning a promise which resolves the service', async function() {
