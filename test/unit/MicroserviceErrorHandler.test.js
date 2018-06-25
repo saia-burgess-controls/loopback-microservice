@@ -20,7 +20,7 @@ describe('The MicroserviceErrorHandler class', function(){
 
     it('throws and error if it cannot extract a service name (there is no reason to use it otherwise' +
         ' at this time', function(){
-        expect(() => new MicroserviceErrorHandler({})).to.throw();
+        expect(() => new MicroserviceErrorHandler({})).to.throw(/.*.*/);
     });
 
     it('accepts an additional options object containing a delegateHandler (for testing) which ' +
