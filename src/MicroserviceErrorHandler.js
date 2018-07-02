@@ -28,18 +28,16 @@ module.exports = class MicroserviceErrorHandler {
     }
 
     _copyAndAddSafeFields(options, fields = []) {
-        const opts = Object.assign({}, options);
-        if (!Array.isArray(opts.safeFields)) {
-            opts.safeFields = fields;
-        } else {
-            opts.safeFields.push(...fields);
-        }
-        return opts;
+        const originalSafeFields = Array.isArray(options.safeFields) ? options.safeFields : [];
+        const safeFields = originalSafeFields.concat(fields);
+        // assign all properties and override the safeFields with the newly allocated array
+        return Object.assign({}, options, { safeFields });
     }
 
     createErrorHandler() {
         return (err, req, res, next) => {
-            err.serviceName = this.serviceName; // eslint-disable-line no-param-reassign
+            // eslint-disable-next-line no-param-reassign
+            err.serviceName = this.serviceName;
             return this.handler.call(null, err, req, res, next);
         };
     }
