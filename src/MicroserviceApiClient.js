@@ -3,8 +3,8 @@ const url = require('url');
 
 module.exports = class MicroserviceApiClient {
 
-    constructor(baseUrl, {requestLibrary = superagent} = {}) {
-        this.base = baseUrl;
+    constructor(baseUrl, { requestLibrary = superagent } = {}) {
+        this.base = this.normalizeBaseUrl(baseUrl);
         this.request = requestLibrary;
     }
 
@@ -24,7 +24,7 @@ module.exports = class MicroserviceApiClient {
         return this.request.patch(this.createEndpoint(path), data);
     }
 
-    options(path){
+    options(path) {
         return this.request.options(this.createEndpoint(path));
     }
 
@@ -33,7 +33,37 @@ module.exports = class MicroserviceApiClient {
     }
 
     createEndpoint(path) {
-        return `${this.base}${path}`;
+        const relativePath = this.normalizeUrlPath(path);
+        return url.resolve(this.base, relativePath);
+    }
+
+    /**
+     * Normalizes the query path that gets appended to the baseUrl by removing a leading separator
+     * if present (The separator defaults to /).
+     *
+     * @param path string
+     * @param separator string
+     * @return string
+     */
+    normalizeUrlPath(path = '', separator = '/') {
+        if (path.startsWith(separator)) {
+            return path.slice(separator.length);
+        }
+        return path;
+    }
+
+    /**
+     * Normalizes an url by appending a separator if not present.
+     *
+     * @param baseUrl string
+     * @param separator string
+     * @return {*}
+     */
+    normalizeBaseUrl(baseUrl, separator = '/') {
+        if (!baseUrl.endsWith(separator)) {
+            return `${baseUrl}${separator}`;
+        }
+        return baseUrl;
     }
 
     static fromURL(urlOptions, options = {}) {

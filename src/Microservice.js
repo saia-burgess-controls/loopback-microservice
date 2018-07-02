@@ -1,11 +1,12 @@
 const { promisify } = require('util');
 
-const loopback = require('loopback');
 const boot = require('loopback-boot');
+const loopback = require('loopback');
 
 const MicroserviceApiClient = require('./MicroserviceApiClient');
 const MicroserviceError = require('./MicroserviceError');
 const LoopbackModelBase = require('./LoopbackModelBase');
+const errorHandler = require('./errorHandler');
 
 /**
  * Basic Microservice class wrapping a loopback application.
@@ -14,12 +15,21 @@ const LoopbackModelBase = require('./LoopbackModelBase');
  */
 module.exports = class Microservice {
 
-    constructor(app, bootOptions = {}) {
+    constructor(app, options = {}) {
+        const bootOptions = Object.assign({}, options.boot);
+
         this.app = app;
+        this.config = Object.assign({}, this.constructor.getConfig(app), options);
+        this.name = this.constructor.getServiceName(app);
+
         this.server = null;
         this.api = null;
 
-        this.bootOptions = Object.assign({}, bootOptions);
+        this.bootOptions = bootOptions;
+    }
+
+    getName() {
+        return this.name;
     }
 
     isRunning() {
@@ -36,7 +46,7 @@ module.exports = class Microservice {
         if (!this.isRunning()) {
             return this;
         } else {
-            const server = this.server;
+            const { server } = this;
             // avoid race conditions
             this.server = null;
             return new Promise((resolve, reject) => {
@@ -61,7 +71,7 @@ module.exports = class Microservice {
      */
     async start() {
 
-        if (this.isRunning()){
+        if (this.isRunning()) {
             return this;
         } else {
             return new Promise((resolve) => {
@@ -90,7 +100,7 @@ module.exports = class Microservice {
 
     }
 
-    setupApiClient(app){
+    setupApiClient(app) {
         const options = {
             hostname: app.get('host'),
             port: app.get('port'),
@@ -124,8 +134,8 @@ module.exports = class Microservice {
      *
      * @returns {Promise.<Microservice>}
      */
-    static async start(bootOptions = {}) {
-        const service = await Microservice.boot(bootOptions);
+    static async start(options = {}) {
+        const service = await Microservice.boot(options);
         return service.start();
     }
 
@@ -141,13 +151,26 @@ module.exports = class Microservice {
      * @param options
      * @returns {Promise.<Microservice>}
      */
-    static async boot(bootOptions = {}) {
+    static async boot(options = {}) {
         const app = loopback();
-        return (new Microservice(app, bootOptions)).boot();
+        return (new Microservice(app, options)).boot();
     }
 
+    static getConfig(app, key, fallback) {
+        const config = app.get('microservice') || {};
+        if (key) {
+            return config[key] || fallback;
+        } else {
+            return config;
+        }
+    }
+
+    static getServiceName(app, fallback = 'Microservice') {
+        return this.getConfig(app, 'name', fallback);
+    }
 };
 
 module.exports.Error = MicroserviceError;
 module.exports.MicroserviceError = MicroserviceError;
 module.exports.LoopbackModelBase = LoopbackModelBase;
+module.exports.errorHandler = errorHandler;

@@ -29,19 +29,47 @@ want access to configured models and the datasources. Therefore you can boot the
     const models = loopbackApp.models;
 ```
 
-Both examples rely on a default configuration during the boot process (letting loopback handle the configuration).
-Both methods (`Microservice.boot()`, `Microservice.start`) accept an options object which is directly passed to 
-`loopback-boot` _i.e._ the compiler. The `options` object accepts properties such as the `appRootDir`. For more 
-information have a look at the [corresponding documentation](https://apidocs.strongloop.com/loopback-boot/). Having 
+Both examples rely on a default configuration of the microservice itself and especially Loopback's 
+boot process. Both methods (`Microservice.boot()`, `Microservice.start`) accept an options object 
+which is directly passed to the `Microservice` constructor. 
+
+Especially important is the (optional )`boot` property of this options which are directly passed to 
+`loopback-boot` _i.e._ the compiler. The `boot` object accepts properties such as the `appRootDir`. 
+For more  information have a look at  the 
+[corresponding documentation](https://apidocs.strongloop.com/loopback-boot/). Having 
 custom boot options allows you to boot an application from different sources.
 
-These factory methods are only for convenience. You can always setup a `Microservice` by passing your own app instance:
+> **Note:** Starting multiple instances of a Loopback app within the same process leads to shared
+state between them (might be due to the registry)!!
+
+These factory methods are only for convenience. You can always setup a `Microservice` by passing 
+your own app instance:
 
 ```Javascript
-    const bootOptions = {appRootDir: '/home/apps/loopback/demo'};
-    const service = new Microservice(loopbackApp, bootOptions);
+    const boot = {appRootDir: '/home/apps/loopback/demo'};
+    const options = { boot };
+    // previously: new Microservice(loopbackApp, boot);
+    const service = new Microservice(loopbackApp, options);
+
     await service.boot();
     await service.start();
+```
+
+> **Note** Previous versions of the package directly expected the boot options to be passed to the
+constructor. This has changed in version 1.0.0
+
+## Configuration
+
+While we currently do not really use any configuration options, the `Microservice` consumes the
+`microservice` config section of your Loopback apps config (e.g. `config.json`). The only value it 
+currently reads is the `name` property (available as `service.getName()`).
+
+```Json
+{
+    "microservice": {
+        "name": "my-service"
+    }
+}
 ```
 
 ## API
@@ -60,8 +88,9 @@ Using this api client is especially useful for integration testing.
 
 ## Error Handling
 
-The package exposes a custom error class, useful for typed error handling. This allows you to 
-differentiate between your errors and errors caused by the rest of the application.
+The package exposes a custom error class and a basic error handler, useful for typed error handling.
+This allows you to  differentiate between your errors and errors caused by the rest of the 
+application and simplifies error tracing.
 
 One can pass additional data to the error by passing an additional object to the constructor, which is assigned to the error
 instance.
@@ -90,6 +119,44 @@ instance.
 > **Note**: The error class was (and still is for backwards compatibility) previously exposed as 
 Error. Since this might lead to unwanted side effects when using destructuring - _i.e._ would override
 the standard Error class - we also expose it at the `MicroserviceError` property.
+
+### Error Handler
+
+The error handler middleware is a simple wrapper for the [strong-error-handler](https://github.com/strongloop/strong-error-handler).
+All of the configuration you pass will be directly forwarded to the strong-error-handler.
+
+Hook in the microservice-error-handler in your `middleware.json`. Sadly, the error handler does not
+seem to have access to the app and its configuration. Therefore you need to add the name of your
+service to the error handler too. You can add it using the `serviceName` property or copy the global
+config of your microservice:
+
+```Json
+{
+    "final:after": {
+        "@joinbox/loopback-microservice#errorHandler": {
+            "params": {
+                "serviceName": "your-service",
+                "microservice": "${microservice}"
+                // additional stuff for the strong error handler
+            }
+        }
+    }
+}
+```
+
+This will enrich the error included in your responses with the `serviceName` property.
+
+> *Note:* If you use strong-remoting and want failing requests to your rest api (ie invalid routes)
+to be handled by the same error handler, you have to disable the error handling in the remoting
+config of your config.json:
+
+```Json
+    "remoting": {
+        "rest": {
+            "handleErrors": false
+        }
+    }
+``` 
 
 ## Testing
 

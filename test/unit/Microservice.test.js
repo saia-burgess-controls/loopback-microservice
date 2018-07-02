@@ -30,7 +30,7 @@ describe('The Microservice Class', function(){
 
     it('accepts boot options', function(){
         const app = new MockApp();
-        const bootOptions = {
+        const boot = {
             appRootDir: './test',
             appConfigRootDir: './test/config',
             componentRootDir: './test/config',
@@ -39,9 +39,33 @@ describe('The Microservice Class', function(){
             middlewareRootDir: '/test/config',
             modelsRootDir: '/test/config',
         };
-        const service = new Microservice(app, bootOptions);
+        const service = new Microservice(app,  { boot });
 
-        expect(service.bootOptions).to.deep.equal(bootOptions);
+        expect(service.bootOptions).to.deep.equal(boot);
     });
 
+    it('takes configuration values from the app using the "microservice" key', function(){
+        const microservice = {
+            name: 'test-service',
+        };
+        const app = new MockApp({microservice});
+        const service = new Microservice(app, {});
+
+        expect(service.getName()).to.be.equal('test-service');
+    });
+
+    it('the options object can have a boot section for future use', function(){
+        const microservice = {
+            name: 'test-service',
+        };
+        const options = {
+            boot: {
+                appRootDir: './test',
+            },
+        };
+        const app = new MockApp({microservice});
+        const service = new Microservice(app, options);
+
+        expect(service.bootOptions).to.be.deep.equal(options.boot);
+    });
 });
