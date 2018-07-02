@@ -16,10 +16,7 @@ const errorHandler = require('./errorHandler');
 module.exports = class Microservice {
 
     constructor(app, options = {}) {
-        // for backwards compatibility
-        const bootOptions = Object.prototype.hasOwnProperty.call(options, 'boot')
-            ? Object.assign({}, options.boot)
-            : Object.assign({}, options);
+        const bootOptions = Object.assign({}, options.boot);
 
         this.app = app;
         this.config = Object.assign({}, this.constructor.getConfig(app), options);

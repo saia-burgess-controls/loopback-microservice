@@ -31,10 +31,12 @@ want access to configured models and the datasources. Therefore you can boot the
 
 Both examples rely on a default configuration of the microservice itself and especially Loopback's 
 boot process. Both methods (`Microservice.boot()`, `Microservice.start`) accept an options object 
-which is directly passed to the `Microservice` constructor. Especially important is the boot 
-property of this options which are directly passed to `loopback-boot` _i.e._ the compiler. 
-The `boot` object accepts properties such as the `appRootDir`. For more  information have a look at 
-the [corresponding documentation](https://apidocs.strongloop.com/loopback-boot/). Having 
+which is directly passed to the `Microservice` constructor. 
+
+Especially important is the (optional )`boot` property of this options which are directly passed to 
+`loopback-boot` _i.e._ the compiler. The `boot` object accepts properties such as the `appRootDir`. 
+For more  information have a look at  the 
+[corresponding documentation](https://apidocs.strongloop.com/loopback-boot/). Having 
 custom boot options allows you to boot an application from different sources.
 
 > **Note:** Starting multiple instances of a Loopback app within the same process leads to shared
@@ -54,10 +56,7 @@ your own app instance:
 ```
 
 > **Note** Previous versions of the package directly expected the boot options to be passed to the
-constructor. To keep the Microservice maintainable, the boot options are now expected to be passed
-as part of a general options object `{ boot: { appRootDir: '...' }}`. While the current minor versions will still support the old 
-way of passing these options (if the passed object has no boot property, the constructor assumes
-that you are using the old syntax), the major version will not be backward compatible anymore.
+constructor. This has changed in version 1.0.0
 
 ## Configuration
 

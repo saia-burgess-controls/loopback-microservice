@@ -8,12 +8,14 @@ const appRootDir = path.resolve(__dirname, '../support/fixtures/loopback');
 describe('The Microservice', function() {
 
     before('boot a service', async function(){
-        this.ms = await Microservice.boot({appRootDir});
+        const boot = { appRootDir };
+        this.ms = await Microservice.boot({boot});
     });
 
 
-    it('can be directly started from a static method taking the boot options as a parameter', async function(){
-        const ms = await Microservice.start({appRootDir});
+    it('can be directly started from a static method taking options as a parameter', async function(){
+        const boot = { appRootDir };
+        const ms = await Microservice.start({ boot });
         try {
             expect(ms).to.be.an.instanceOf(Microservice);
             await ms.stop();
