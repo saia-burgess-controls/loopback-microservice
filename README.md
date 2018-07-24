@@ -1,6 +1,18 @@
 # loopback-microservice
 
-Thin layer to wrap the loopback application for easier testing and sharing of functionality between repositories.
+Thin layer to wrap the loopback application for easier testing and sharing of functionality between 
+repositories.
+
+## Important
+
+We found out that some of the functionality of `Loopback` depends on the state of the application.
+Especially the `app.get` method we use to access configuration does only work correctly after the 
+boot process. For now we don't have the resources to refactor the package accordingly, so please be 
+aware that the following instance methods will only work correctly after the service/app is booted:
+
+  - `getName`
+  - `getLogger`
+  - `start`
 
 ## General
 

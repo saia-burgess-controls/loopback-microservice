@@ -16,7 +16,6 @@ module.exports = class Microservice {
         const bootOptions = Object.assign({}, options.boot);
 
         this.app = app;
-        this.config = Object.assign({}, this.constructor.getConfig(app), options);
 
         this.server = null;
         this.api = null;
@@ -104,7 +103,7 @@ module.exports = class Microservice {
     }
 
     getLogger() {
-        return this.app.get('microservice-logger');
+        return this.constructor.getServiceLogger(this.app);
     }
 
     /**
@@ -120,7 +119,8 @@ module.exports = class Microservice {
      * @returns {Promise.<Microservice>}
      */
     async boot() {
-        return promisify(boot)(this.app, this.bootOptions).then(() => this);
+        await promisify(boot)(this.app, this.bootOptions);
+        return this;
     }
 
     /**
@@ -157,6 +157,11 @@ module.exports = class Microservice {
         } else {
             return config;
         }
+    }
+
+    static getServiceLogger(app, fallback) {
+        const loggerKey = this.getConfig(app, 'logger', 'microservice-logger');
+        return app.get(loggerKey) || fallback;
     }
 
     static getServiceName(app, fallback = 'Microservice') {

@@ -68,4 +68,28 @@ describe('The Microservice Class', function(){
 
         expect(service.bootOptions).to.be.deep.equal(options.boot);
     });
+
+    it('allows injecting a logger via app using the default key "microservice-logger"', function() {
+        const microservice = {};
+        const logger = {};
+        const app = new MockApp({
+            'microservice-logger': logger,
+            microservice,
+        });
+        const service = new Microservice(app, {});
+        expect(service.getLogger()).to.be.equal(logger);
+    });
+
+    it('allows setting the logger key using the "microservice.logger" configuration', function() {
+        const microservice = {
+            logger: 'myLogger',
+        };
+        const myLogger = {};
+        const app = new MockApp({
+            myLogger,
+            microservice,
+        });
+        const service = new Microservice(app, {});
+        expect(service.getLogger()).to.be.equal(myLogger);
+    })
 });
