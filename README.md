@@ -74,15 +74,24 @@ constructor. This has changed in version 1.0.0
 
 While we currently do not really use any configuration options, the `Microservice` consumes the
 `microservice` config section of your Loopback apps config (e.g. `config.json`). The only value it 
-currently reads is the `name` property (available as `service.getName()`).
+currently reads is the `name` property (available as `service.getName()` AFTER booting the app).
 
 ```Json
 {
     "microservice": {
-        "name": "my-service"
+        "name": "my-service",
+        "logger": "my-logger",
     }
 }
 ```
+
+The logger property (default is `"microservice-logger")` allows injecting a logger component which 
+must be avialable via `app.get("my-logger")`. If one wants to access the same logger from somewhere
+else in the code just use the static `Microservice.getServiceLogger(app)` method. On the service
+instance itself it is exposed as `microservice.getLogger()`.
+
+> **Note:** Currently the logger might be undefined if no logger is injected. In the future we might
+add a silent (null) logger to avoid cumbersome checks.
 
 ## API
 
