@@ -1,6 +1,7 @@
 const path = require('path');
 
 const { expect } = require('chai');
+const loopback = require('loopback');
 
 const Microservice = require('../../src/Microservice');
 const appRootDir = path.resolve(__dirname, '../support/fixtures/loopback');
@@ -80,6 +81,25 @@ describe('The Microservice', function() {
 
         expect(this.ms).to.equal(stopped);
     });
+
+    it('exposes the correct service name, as soon as the app is booted ("Microservice" per default)',
+        async function(){
+            const app = loopback();
+            const options = {
+                microservice: {
+                    name: 'test-service',
+                },
+                boot: {
+                    appRootDir,
+                },
+            };
+            const ms = new Microservice(app, options);
+            expect(ms.getName()).to.be.equal('Microservice');
+
+            await ms.boot();
+            expect(ms.getName()).to.be.equal('test-service');
+        }
+    );
 
     after('stop the service', function(){
         return this.ms.stop();
