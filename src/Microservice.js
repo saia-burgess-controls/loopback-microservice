@@ -4,9 +4,6 @@ const boot = require('loopback-boot');
 const loopback = require('loopback');
 
 const MicroserviceApiClient = require('./MicroserviceApiClient');
-const MicroserviceError = require('./MicroserviceError');
-const LoopbackModelBase = require('./LoopbackModelBase');
-const errorHandler = require('./errorHandler');
 
 /**
  * Basic Microservice class wrapping a loopback application.
@@ -19,8 +16,6 @@ module.exports = class Microservice {
         const bootOptions = Object.assign({}, options.boot);
 
         this.app = app;
-        this.config = Object.assign({}, this.constructor.getConfig(app), options);
-        this.name = this.constructor.getServiceName(app);
 
         this.server = null;
         this.api = null;
@@ -29,7 +24,7 @@ module.exports = class Microservice {
     }
 
     getName() {
-        return this.name;
+        return this.constructor.getServiceName(this.app);
     }
 
     isRunning() {
@@ -45,23 +40,22 @@ module.exports = class Microservice {
 
         if (!this.isRunning()) {
             return this;
-        } else {
-            const { server } = this;
-            // avoid race conditions
-            this.server = null;
-            return new Promise((resolve, reject) => {
-                // does not work with promisify
-                server.close((error) => {
-                    if (error) {
-                        // if unable to stop the server, reassign it.
-                        this.server = server;
-                        reject(error);
-                    } else {
-                        resolve(this);
-                    }
-                });
-            });
         }
+
+        const { server } = this;
+        // avoid race conditions
+        this.server = null;
+        return new Promise((resolve, reject) => {
+            // does not work with promisify
+            server.close((error) => {
+                if (error) {
+                    // if unable to stop the server, reassign it.
+                    this.server = server;
+                    return reject(error);
+                }
+                resolve(this);
+            });
+        });
     }
 
     /**
@@ -73,31 +67,30 @@ module.exports = class Microservice {
 
         if (this.isRunning()) {
             return this;
-        } else {
-            return new Promise((resolve) => {
-                // @note: this method might throw an exception, we should not catch it,
-                //        due to possible issues in the testing
-                this.server = this.app.listen(() => {
-
-                    this.app.emit('started');
-
-                    const baseUrl = this.app.get('url').replace(/\/$/, '');
-                    const explorer = this.app.get('loopback-component-explorer');
-                    const logger = this.getLogger();
-
-                    if (logger) {
-                        logger.info('Web server listening at: %s', baseUrl);
-                        if (explorer) {
-                            const explorerPath = explorer.mountPath;
-                            logger.info('Browse your REST API at %s%s', baseUrl, explorerPath);
-                        }
-                    }
-                    this.api = this.setupApiClient(this.app);
-                    resolve(this);
-                });
-            });
         }
 
+        return new Promise((resolve) => {
+            // @note: this method might throw an exception, we should not catch it,
+            //        due to possible issues in the testing
+            this.server = this.app.listen(() => {
+
+                this.app.emit('started');
+
+                const baseUrl = this.app.get('url').replace(/\/$/, '');
+                const explorer = this.app.get('loopback-component-explorer');
+                const logger = this.getLogger();
+
+                if (logger) {
+                    logger.info('Web server listening at: %s', baseUrl);
+                    if (explorer) {
+                        const explorerPath = explorer.mountPath;
+                        logger.info('Browse your REST API at %s%s', baseUrl, explorerPath);
+                    }
+                }
+                this.api = this.setupApiClient(this.app);
+                resolve(this);
+            });
+        });
     }
 
     setupApiClient(app) {
@@ -110,7 +103,7 @@ module.exports = class Microservice {
     }
 
     getLogger() {
-        return this.app.get('microservice-logger');
+        return this.constructor.getServiceLogger(this.app);
     }
 
     /**
@@ -126,7 +119,8 @@ module.exports = class Microservice {
      * @returns {Promise.<Microservice>}
      */
     async boot() {
-        return promisify(boot)(this.app, this.bootOptions).then(() => this);
+        await promisify(boot)(this.app, this.bootOptions);
+        return this;
     }
 
     /**
@@ -165,12 +159,12 @@ module.exports = class Microservice {
         }
     }
 
+    static getServiceLogger(app, fallback) {
+        const loggerKey = this.getConfig(app, 'logger', 'microservice-logger');
+        return app.get(loggerKey) || fallback;
+    }
+
     static getServiceName(app, fallback = 'Microservice') {
         return this.getConfig(app, 'name', fallback);
     }
 };
-
-module.exports.Error = MicroserviceError;
-module.exports.MicroserviceError = MicroserviceError;
-module.exports.LoopbackModelBase = LoopbackModelBase;
-module.exports.errorHandler = errorHandler;
