@@ -59,19 +59,43 @@ describe('The Microservice', function() {
         expect(response).to.have.property('status', 200);
     });
 
-    it('exposes an error handler which enriches the error with the serviceName ' +
-        'if configured accordingly', async function(){
+    it(
+        'exposes an error handler which enriches the error with the serviceName and a serviceTrace containing all the service Names the error went through (if configured accordingly)',
+        async function(){
 
+            const service = await this.ms.start();
+            try {
+                await service
+                    .api
+                    .get('/nonExisting')
+                    .set('accept', 'application/json');
+                return Promise.reject(new Error('Request to non existing route should fail.'))
+            } catch ({response}) {
+                const {body} = response;
+                expect(body.error).to.have.property('serviceName', 'test-service');
+                expect(body.error).to.have.property('serviceTrace').that.deep.equals([
+                    'test-service',
+                ]);
+            }
+        },
+    );
+
+    it('respects existing serviceName and extends the serviceTrace on error', async function(){
         const service = await this.ms.start();
         try {
             await service
                 .api
-                .get('/nonExisting')
+                // omit api prefix
+                .get('../error/withservicetrace')
                 .set('accept', 'application/json');
-            return Promise.reject(new Error('Request to non existing route should fail.'))
+            return Promise.reject(new Error('Request to error route should fail.'));
         } catch ({response}) {
             const {body} = response;
-            expect(body.error).to.have.property('serviceName', 'test-service');
+            expect(body.error).to.have.property('serviceName', 'remote-test-service');
+            expect(body.error).to.have.property('serviceTrace').that.deep.equals([
+                'remote-test-service',
+                'test-service',
+            ]);
         }
     });
 

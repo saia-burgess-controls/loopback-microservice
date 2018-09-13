@@ -46,6 +46,7 @@ describe('The MicroserviceErrorHandler class', function(){
             expect(options).to.have.property('safeFields').that.deep.equals([
                 'errorCode',
                 'serviceName',
+                'serviceTrace',
             ]);
         };
 
@@ -64,6 +65,7 @@ describe('The MicroserviceErrorHandler class', function(){
                 'testField',
                 'errorCode',
                 'serviceName',
+                'serviceTrace',
             ]);
         };
 
