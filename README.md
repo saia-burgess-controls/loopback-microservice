@@ -156,16 +156,21 @@ config of your microservice:
     "final:after": {
         "@joinbox/loopback-microservice#errorHandler": {
             "params": {
-                "serviceName": "your-service",
-                "microservice": "${microservice}"
-                // additional stuff for the strong error handler
+                "serviceName": "your-service, add this only if you don't want to pass the microservice configuration",
+                "microservice": "${microservice}",
+                "additionalConfig": "consumed by strong error handler"
             }
         }
     }
 }
 ```
 
-This will enrich the error included in your responses with the `serviceName` property.
+This will enrich the error included in your responses with the `serviceName` property if not already
+set by another service (to be able to track the origin of an error).
+
+Also, the error-handler will add a `serviceTrace` property to the error, containing the names of
+all services the error went through (as long as they use the same error handling logic and pass
+the necessary properties).
 
 > *Note:* If you use strong-remoting and want failing requests to your rest api (ie invalid routes)
 to be handled by the same error handler, you have to disable the error handling in the remoting
