@@ -49,7 +49,7 @@ module.exports = class MicroserviceErrorHandler {
             }
 
             err.serviceTrace.push(this.serviceName);
-            return this.handler.call(null, err, req, res, next);
+            return this.handler(err, req, res, next);
         };
     }
 };
