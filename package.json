@@ -1,6 +1,6 @@
 {
   "name": "@joinbox/loopback-microservice",
-  "version": "1.0.1",
+  "version": "1.1.1",
   "description": "Thin layer to wrap the loopback application for easier testing and sharing of functionality between repositories.",
   "main": "index.js",
   "directories": {

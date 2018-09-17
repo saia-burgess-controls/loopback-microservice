@@ -6,7 +6,7 @@ const MicroserviceError = require('./MicroserviceError');
 module.exports = class MicroserviceErrorHandler {
 
     constructor(options, { delegateHandler = strongErrorHandler } = {}) {
-        const fields = ['errorCode', 'serviceName'];
+        const fields = ['errorCode', 'serviceName', 'serviceTrace'];
         const opts = this._copyAndAddSafeFields(options, fields);
 
         this.serviceName = this.extractServiceName(opts);
@@ -36,9 +36,20 @@ module.exports = class MicroserviceErrorHandler {
 
     createErrorHandler() {
         return (err, req, res, next) => {
-            // eslint-disable-next-line no-param-reassign
-            err.serviceName = this.serviceName;
-            return this.handler.call(null, err, req, res, next);
+            // prevent the service from overriding errors from remote services
+            if (!err.serviceName) {
+                // eslint-disable-next-line no-param-reassign
+                err.serviceName = this.serviceName;
+            }
+
+            // store the names of the services the error has gone through
+            if (!Array.isArray(err.serviceTrace)) {
+                // eslint-disable-next-line no-param-reassign
+                err.serviceTrace = [];
+            }
+
+            err.serviceTrace.push(this.serviceName);
+            return this.handler(err, req, res, next);
         };
     }
 };
