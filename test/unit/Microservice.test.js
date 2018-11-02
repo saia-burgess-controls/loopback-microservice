@@ -91,5 +91,6 @@ describe('The Microservice Class', function(){
         });
         const service = new Microservice(app, {});
         expect(service.getLogger()).to.be.equal(myLogger);
-    })
+    });
+
 });
