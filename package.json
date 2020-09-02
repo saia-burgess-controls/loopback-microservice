@@ -1,5 +1,5 @@
 {
-  "name": "@joinbox/loopback-microservice",
+  "name": "@maugli-sbc/loopback-microservice",
   "version": "1.2.1",
   "description": "Thin layer to wrap the loopback application for easier testing and sharing of functionality between repositories.",
   "main": "index.js",
